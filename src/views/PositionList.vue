@@ -27,50 +27,40 @@
           <th>岗位薪资</th>
           <th style="width: 140px">操作</th>
         </tr>
-        <!-- {{if data.length > 0}} -->
-          <!-- {{each data}} -->
-          <tr>
-            <td>1</td>
-            <td><img width="50" height="50" src="http://10.9.164.98:3000/uploads/" alt=""></td>
-            <td>dfd</td>
-            <td>dfdf</td>
-            <td>dfd</td>
-            <td>df</td>
-            <td>dfd</td>
+        <template v-if="list.length > 0">
+          <tr v-for="(v,i) of list">
+            <td>{{i+1}}</td>
+            <td><img width="50" height="50" :src="`http://10.9.164.98:3000/uploads/${v.companyLogo}`" alt=""></td>
+            <td>{{v.companyName}}</td>
+            <td>{{v.positionName}}</td>
+            <td>{{v.city}}</td>
+            <td>{{v.createTime}}</td>
+            <td>{{v.salary}}</td>
             <td>
-              <button class="btn btn-sm btn-primary pos-edit" posid=""><span class="fa fa-edit"></span> 修改</button>
-              <button class="btn btn-sm btn-danger pos-remove" posid="" filename=""><span class="fa fa-remove"></span> 删除</button>
+              <button class="btn btn-sm btn-primary pos-edit" :posid="v._id"><span class="fa fa-edit"></span> 修改</button>
+              <button class="btn btn-sm btn-danger pos-remove" :posid="v._id" :filename="v.companyLogo"><span class="fa fa-remove"></span> 删除</button>
             </td>
           </tr>
-          <!-- <tr>
-            <td>{{$index+1}}</td>
-            <td><img width="50" height="50" src="http://10.9.164.98:3000/uploads/{{$value.companyLogo}}" alt=""></td>
-            <td>{{$value.companyName}}</td>
-            <td>{{$value.positionName}}</td>
-            <td>{{$value.city}}</td>
-            <td>{{$value.createTime}}</td>
-            <td>{{$value.salary}}</td>
-            <td>
-              <button class="btn btn-sm btn-primary pos-edit" posid="{{$value._id}}"><span class="fa fa-edit"></span> 修改</button>
-              <button class="btn btn-sm btn-danger pos-remove" posid="{{$value._id}}" filename="{{$value.companyLogo}}"><span class="fa fa-remove"></span> 删除</button>
-            </td>
-          </tr> -->
-          <!-- {{/each}} -->
-        <!-- {{else}} -->
-          <tr>
-            <td colspan="8">暂无记录。</td>
-          </tr>
-        <!-- {{/if}} -->
+        </template>
+        <tr v-else>
+          <td colspan="8">暂无记录。</td>
+        </tr>
       </table>
     </div>
     <!-- /.box-body -->
     <div class="box-footer clearfix">
       <ul class="pagination pagination-sm no-margin pull-right">
-        <li><a href="#">&laquo;</a></li>
+        <li>
+          <router-link :to="{ name: 'positionlist', params: { start: startFirst, count}}">&laquo;</router-link>
+        </li>
         <!-- {{each pages}} -->
-        <li class=""><a href="#"></a></li>
+        <li :class="getCurrentPage(i)" v-for="(n,i) of getPageCount">
+          <router-link :to="{ name: 'positionlist', params: { start: i * count, count}}">{{n}}</router-link>
+        </li>
         <!-- {{/each}} -->
-        <li><a href="#">&raquo;</a></li>
+        <li>
+          <router-link :to="{ name: 'positionlist', params: { start: startLast, count}}">&raquo;</router-link>
+        </li>
       </ul>
     </div>
   </div>
@@ -78,11 +68,67 @@
 
 </template>
 <script>
+import userModel from '../models/user'
+import positionModel from '../models/position'
+const wsCache = new WebStorageCache()
+
+const token = wsCache.get('token')
 export default {
   name: "PositionList",
   data: () => ({
-
-  })
+    list: [],
+    total: 0,
+    count: 10
+  }),
+  async beforeRouteEnter (to, from, next) {
+    let result = await userModel.isSignin(token)
+    if (result.ret) {
+      next()
+    } else {
+      alert('请求受限！')
+    }
+  },
+  async mounted() {
+    let result = await positionModel.list({start: 0, count: this.count, token})
+    this.list = result.data.result
+    this.total = result.data.total
+  },
+  async beforeRouteUpdate (to, from, next) {
+    const {start, count} = to.params
+    let result = await positionModel.list({start, count, token})
+    this.list = result.data.result
+    this.total = result.data.total
+    next()
+  },
+  methods: {
+    getCurrentPage(i) {
+      let currentPage = this.$route.params.start / this.count
+      return currentPage == i ? 'active' : ''
+    }
+  },
+  computed: {
+    getPageCount() {
+      return Math.ceil(this.total / this.count)
+    },
+    startFirst() {
+      let currentPage = this.$route.params.start / this.count
+      let pageCount = this.getPageCount
+      if (currentPage == 0) {
+        return 0
+      } else {
+        return (currentPage - 1) * this.count
+      }
+    },
+    startLast() {
+      let currentPage = this.$route.params.start / this.count
+      let pageCount = this.getPageCount
+      if (currentPage + 1 == pageCount) {
+        return (pageCount - 1) * this.count
+      } else {
+        return (currentPage + 1) * this.count
+      }
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

@@ -138,11 +138,11 @@
                     <div class="box-body">
                       <div class="form-group user">
                         <label for="exampleInputEmail1">用户名：</label>
-                        <input type="text" class="form-control" id="username" placeholder="请输入用户名">
+                        <input type="text" class="form-control" v-model="userinfo.username" placeholder="请输入用户名">
                       </div>
                       <div class="form-group">
                         <label for="exampleInputPassword1">密码：</label>
-                        <input type="password" class="form-control" id="password" placeholder="请输入密码">
+                        <input type="password" class="form-control" v-model="userinfo.password" placeholder="请输入密码">
                       </div>
                     </div>
                   </form>
@@ -166,7 +166,7 @@
                 </template>
                 <template v-else>
                   <div class="pull-right">
-                    <a href="javascript:void(0)" class="btn btn-default btn-flat">退出</a>
+                    <a href="javascript:void(0)" @click="handleSignoutClick()" class="btn btn-default btn-flat">退出</a>
                   </div>
                 </template>
               </li>
@@ -190,26 +190,40 @@ export default {
   data: () => ({
     greeting: '',
     isSignin: false,
-    buttonType: ''
+    buttonType: '',
+    userinfo: {
+      username: '',
+      password: ''
+    }
   }),
   methods: {
     changeButtonType(type) {
       this.buttonType = type
     },
-    handleSubmitClick() {
+    async handleSubmitClick() {
       if (this.buttonType == 'signin') {
-        // todo 登录逻辑
-        console.log('signin');
+        let result = await userModel.sign(this.userinfo, 'signin')
+        if (result.ret) {
+          wsCache.set('token', result.data.token)
+          this.greeting = `你好，${result.data.username}`
+          this.isSignin = true
+        }
       } else {
-        // todo 注册逻辑
-        console.log('signup');
+        let result = await userModel.sign(this.userinfo, 'signup')
+        console.log(result);
       }
+    },
+    handleSignoutClick() {
+      wsCache.delete('token')
+      this.greeting = ''
+      this.isSignin = false
     }
   },
   async mounted() {
     let result = await userModel.isSignin(wsCache.get('token'))
     if (result.ret) {
       this.greeting = `你好，${result.data.username}`
+      this.isSignin = true
     } else {
       this.greeting = ''
       this.isSignin = false

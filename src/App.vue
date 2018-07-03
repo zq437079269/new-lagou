@@ -6,8 +6,6 @@
   export default {
     data: function () {
       return {
-        msg: 'hello',
-        links: ['/page1', '/page2', '/page3']
       }
     }
   }

@@ -42,7 +42,7 @@
             <a href="#"><i class="fa fa-link"></i> <span>首页</span></a>
           </router-link>
 
-          <router-link tag="li" active-class='active' :to="{name: 'positionlist'}">
+          <router-link tag="li" active-class='active' :to="{path: '/positionlist'}">
             <a href="#"><i class="fa fa-link"></i> <span>职位管理</span></a>
           </router-link>
 
@@ -68,13 +68,7 @@
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
       <!-- Content Header (Page header) -->
-      <section class="content-header">
-        <h1><span></span><small></small></h1>
-        <ol class="breadcrumb">
-          <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-          <li class="active">Here</li>
-        </ol>
-      </section>
+      <bread-crumb :title="title" :subtitle="subtitle"></bread-crumb>
 
       <!-- Main content -->
       <section><router-view></router-view></section>
@@ -173,13 +167,45 @@
 </template>
 <script>
 import LagouHeader from './Header.vue'
+import BreadCrumb from './BreadCrumb.vue'
 export default {
   name: "Index",
   data: () => ({
-
+    title: '',
+    subtitle: ''
   }),
   components: {
-    LagouHeader
+    LagouHeader,
+    BreadCrumb
+  },
+  mounted() {
+    this.changeBreadCramb()
+  },
+  updated() {
+    this.changeBreadCramb()
+  },
+  methods: {
+    changeBreadCramb() {
+      // const match = {
+      //   '/home': ['首页', '欢迎信息'],
+      //   '/position': ['职位管理', '列表'],
+      //   '/position_search': ['职位管理', '列表'],
+      //   '/position_save': ['职位管理', '添加'],
+      //   '/position_update': ['职位管理', '编辑']
+      // }
+      let path = this.$route.path
+      switch (path) {
+        case '/home':
+          this.title = '首页',
+          this.subtitle = '欢迎信息'
+          break;
+        case '/positionlist':
+          this.title = '职位管理',
+          this.subtitle = '列表'
+          break;
+        default:
+      }
+    }
   }
 }
 </script>

@@ -20,6 +20,10 @@ export default new Router({
         },
         {
           path: 'positionlist',
+          redirect: '/positionlist/0/10'
+        },
+        {
+          path: 'positionlist/:start/:count',
           name: 'positionlist',
           component: PositionList
         }
