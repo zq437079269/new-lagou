@@ -71,7 +71,9 @@
       <bread-crumb :title="title" :subtitle="subtitle"></bread-crumb>
 
       <!-- Main content -->
-      <section><router-view></router-view></section>
+      <section>
+        <router-view></router-view>
+      </section>
       <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
@@ -193,13 +195,13 @@ export default {
       //   '/position_save': ['职位管理', '添加'],
       //   '/position_update': ['职位管理', '编辑']
       // }
-      let path = this.$route.path
-      switch (path) {
-        case '/home':
+      let name = this.$route.name
+      switch (name) {
+        case 'home':
           this.title = '首页',
           this.subtitle = '欢迎信息'
           break;
-        case '/positionlist':
+        case 'positionlist':
           this.title = '职位管理',
           this.subtitle = '列表'
           break;

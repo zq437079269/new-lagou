@@ -40,10 +40,13 @@ const remove = (id, filename) => {
   })
 }
 
-const findByKeywords = ({keywords, start, count}) => {
+const findByKeywords = ({keywords, start, count, token}) => {
   return $.ajax({
     url: '/api/position/search',
     type: 'post',
+    headers: {
+      'X-Access-Token': token
+    },
     data: {
       keywords,
       start,

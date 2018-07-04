@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Index from './views/Index.vue'
 import Home from './views/Home.vue'
 import PositionList from './views/PositionList.vue'
+import AddAndUpdate from './views/AddAndUpdate.vue'
 
 Vue.use(Router)
 
@@ -26,6 +27,11 @@ export default new Router({
           path: 'positionlist/:start/:count',
           name: 'positionlist',
           component: PositionList
+        },
+        {
+          path: 'addandupdate',
+          name: 'addandupdate',
+          component: AddAndUpdate
         }
       ]
     }
